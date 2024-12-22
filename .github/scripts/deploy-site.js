@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-const { ArDriveTurbo } = require("@ardrive/turbo");
-const { ArioSDK } = require("@ariesdo/ario-sdk");
+const { ArDriveTurbo } = require("@ardrive/turbo-sdk");
+const { ArioSDK } = require("@ar.io/sdk");
 const glob = require("glob");
 
 async function updateMarkdownFiles() {

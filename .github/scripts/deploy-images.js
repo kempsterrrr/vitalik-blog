@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { ArDriveTurbo } = require("@ardrive/turbo");
+const { ArDriveTurbo } = require("@ardrive/turbo-sdk");
 const glob = require("glob");
 
 async function deployImages() {

@@ -25,7 +25,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm install -g @ardrive/turbo
+          npm install -g @ardrive/turbo-sdk
           npm install @ar.io/sdk
           gem install bundler jekyll
           bundle install

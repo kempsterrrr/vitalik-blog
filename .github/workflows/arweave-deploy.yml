@@ -1,0 +1,53 @@
+name: Deploy to Arweave
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install Dependencies
+        run: |
+          npm install -g @ardrive/turbo
+          npm install @ariesdo/ario-sdk
+          gem install bundler jekyll
+          bundle install
+
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+
+      - name: Setup Arweave Wallet
+        run: |
+          echo "${{ secrets.ARWEAVE_WALLET_JWK }}" > wallet.json
+
+      - name: Deploy Images to Arweave
+        run: |
+          node .github/scripts/deploy-images.js
+        env:
+          ARDRIVE_NODE_URL: "https://arweave.net"
+          WALLET_PATH: "./wallet.json"
+
+      - name: Deploy Site to Arweave
+        run: |
+          node .github/scripts/deploy-site.js
+        env:
+          ARDRIVE_NODE_URL: "https://arweave.net"
+          WALLET_PATH: "./wallet.json"
+          ARNS_NAME: "${{ secrets.ARNS_NAME }}"

@@ -118,34 +118,67 @@ if __name__ == '__main__':
         sys.exit()
 
     # Normal case: process each provided file
-    for file_location in sys.argv[1:]:
-        filename = os.path.split(file_location)[1]
-        print("Processing file: {}".format(filename))
+    if sys.argv[1:]:
+        for file_location in sys.argv[1:]:
+            filename = os.path.split(file_location)[1]
+            print("Processing file: {}".format(filename))
+            
+            # Extract path
+            file_data = open(file_location).read()
+            metadata = extract_metadata(open(file_location), filename)
+            path = metadata_to_path(metadata)
+            print("Path selected: {}".format(path))
+            
+            # Make sure target directory exists
+            truncated_path = os.path.split(path)[0]
+            os.system('mkdir -p {}'.format(os.path.join('site', truncated_path)))
+            
+            # Generate the html file
+            out_location = os.path.join('site', path)
+            options = metadata.get('pandoc', '')
+            
+            os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
+            total_file_contents = (
+                HEADER +
+                make_twitter_card(metadata, global_config) +
+                defancify(open('/tmp/temp_output.html').read()) +
+                FOOTER
+            )
         
-        # Extract path
-        file_data = open(file_location).read()
-        metadata = extract_metadata(open(file_location), filename)
-        path = metadata_to_path(metadata)
-        print("Path selected: {}".format(path))
-        
-        # Make sure target directory exists
-        truncated_path = os.path.split(path)[0]
-        os.system('mkdir -p {}'.format(os.path.join('site', truncated_path)))
-        
-        # Generate the html file
-        out_location = os.path.join('site', path)
-        options = metadata.get('pandoc', '')
-        
-        os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
-        total_file_contents = (
-            HEADER +
-            make_twitter_card(metadata, global_config) +
-            defancify(open('/tmp/temp_output.html').read()) +
-            FOOTER
-        )
-    
-        # Put it in the desired location
-        open(out_location, 'w').write(total_file_contents)
+            # Put it in the desired location
+            open(out_location, 'w').write(total_file_contents)
+    else:
+        # Build all posts when no specific files are provided
+        print("Building all posts...")
+        for filename in os.listdir('posts'):
+            if filename.endswith('.md') and not filename.endswith('.swp'):
+                file_location = os.path.join('posts', filename)
+                print("Processing file: {}".format(filename))
+                
+                # Extract path
+                file_data = open(file_location).read()
+                metadata = extract_metadata(open(file_location), filename)
+                path = metadata_to_path(metadata)
+                print("Path selected: {}".format(path))
+                
+                # Make sure target directory exists
+                truncated_path = os.path.split(path)[0]
+                os.system('mkdir -p {}'.format(os.path.join('site', truncated_path)))
+                
+                # Generate the html file
+                out_location = os.path.join('site', path)
+                options = metadata.get('pandoc', '')
+                
+                os.system('pandoc -o /tmp/temp_output.html {} {}'.format(file_location, options))
+                total_file_contents = (
+                    HEADER +
+                    make_twitter_card(metadata, global_config) +
+                    defancify(open('/tmp/temp_output.html').read()) +
+                    FOOTER
+                )
+            
+                # Put it in the desired location
+                open(out_location, 'w').write(total_file_contents)
 
     # Reset ToC
     metadatas = []

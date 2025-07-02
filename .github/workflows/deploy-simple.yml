@@ -1,0 +1,33 @@
+name: Deploy to Arweave (Simple)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+          
+      - name: Build site
+        run: python3 publish.py
+          
+      - name: Deploy to Arweave
+        run: npx permaweb-deploy@latest --arns-name vitalik --ario-process testnet
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }} 

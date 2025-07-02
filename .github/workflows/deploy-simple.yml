@@ -27,6 +27,12 @@ jobs:
       - name: Build site
         run: python3 publish.py
           
+      - name: Copy static assets to site/
+        run: |
+          cp -r css site/
+          cp -r scripts site/
+          cp -r images site/
+
       - name: Deploy to Arweave
         run: npx permaweb-deploy@latest --arns-name vitalik-blog --ario-process testnet --deploy-folder ./site
         env:

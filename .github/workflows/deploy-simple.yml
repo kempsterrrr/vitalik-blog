@@ -28,6 +28,6 @@ jobs:
         run: python3 publish.py
           
       - name: Deploy to Arweave
-        run: npx permaweb-deploy@latest --arns-name vitalik --ario-process testnet
+        run: npx permaweb-deploy@latest --arns-name vitalik-blog --ario-process testnet --folder ./site
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }} 
